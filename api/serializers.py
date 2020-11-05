@@ -2,6 +2,8 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from users.models import CustomUser
+from topics.models import Topic
+from tags.models import Tag
 
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,3 +32,16 @@ class CustomJWTSerializer(TokenObtainPairSerializer):
         if user_obj:
             credentials["user_name"] = user_obj.user_name
         return super().validate(credentials)
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = "__all__"
+
+class TopicSerializer(serializers.ModelSerializer):
+    topic_tag = serializers.StringRelatedField(many=True)
+    topic_user = serializers.CharField(source='topic_user.user_name')
+
+    class Meta:
+        model = Topic
+        fields = "__all__"

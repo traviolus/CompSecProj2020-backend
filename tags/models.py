@@ -5,5 +5,5 @@ class Tag(models.Model) :
     tag_name = models.CharField(max_length = 20)
 
     def __str__(self) :
-        return '[' + str(self.tag_id) + '] ' + self.tag_name
+        return self.tag_name
         
