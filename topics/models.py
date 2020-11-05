@@ -13,3 +13,9 @@ class Topic(models.Model):
 
     def __str__(self):
         return self.topic_header + ' : ' + self.topic_user.user_name
+    
+    def get_tag_name(self):
+        return Tag.objects.filter(topics_tag=self).values_list('tag_name', flat=True)
+
+    def get_user_name(self):
+        return CustomUser.objects.get(topics_user=self).user_name

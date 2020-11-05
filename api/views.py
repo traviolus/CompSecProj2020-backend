@@ -17,7 +17,7 @@ class SignupViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
             CustomUserSerializer.create(CustomUserSerializer(), validated_data=request.data)
         except Exception as e:
             return Response(str(e), status=400)
-        return Response('User: ' + user_name + ". Registration successful!")
+        return Response('User: ' + user_name + ". Registration successful!", status=200)
 
 class SigninViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     permission_classes = [AllowAny]
@@ -28,7 +28,7 @@ class SigninViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
             token = CustomJWTSerializer.validate(CustomJWTSerializer(), attrs=request.data)
         except Exception as e:
             return Response(str(e), status=400)
-        return Response(token)
+        return Response(token, status=200)
 
 class TopicViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
@@ -40,3 +40,25 @@ class TopicViewSet(viewsets.ModelViewSet):
             queryset = Topic.objects.filter(topic_tag__tag_name=tag)
         else : queryset = Topic.objects.all()
         return queryset
+
+    def create(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            user = CustomUser.objects.get(user_id=request.user.user_id)
+        else:
+            return Response('The user is not authenticated.', status=401)
+            
+        #Create Topic Object
+        try:
+            serializer = self.get_serializer(data={
+                'topic_header': request.data['topic_header'],
+                'topic_body': request.data['topic_body'],
+                'topic_user': request.user.user_name,
+                'topic_tag': request.data['topic_tag']
+            })
+            
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(data="Created Topic Successfully.", status=200)
+        except Exception as e:
+            return Response(data=str(e), status=400)
