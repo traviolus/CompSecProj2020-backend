@@ -3,6 +3,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from users.models import CustomUser
 from topics.models import Topic
+from comments.models import Comment
 
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -47,3 +48,19 @@ class TopicSerializer(serializers.ModelSerializer):
         )
         new_topic.save()
         return new_topic
+
+class CommentSerializer(serializers.ModelSerializer):
+    comment_user = serializers.CharField(source='get_user_name')
+
+    class Meta:
+        model = Comment
+        fields = "__all__"
+
+    def create(self, validated_data):
+        new_comment = Comment.objects.create(
+            comment_text=validated_data.pop('comment_text'),
+            comment_user=CustomUser.objects.get(user_name=validated_data.pop('get_user_name')),
+            comment_topic=validated_data.pop('comment_topic')
+        )
+        new_comment.save()
+        return new_comment

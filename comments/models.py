@@ -11,3 +11,6 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.comment_text + ' [in] ' + self.comment_topic.topic_header
+
+    def get_user_name(self):
+        return CustomUser.objects.get(comments_user=self).user_name
