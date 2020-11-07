@@ -33,13 +33,7 @@ class SigninViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 class TopicViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     serializer_class = TopicSerializer
-
-    def get_queryset(self):
-        tag = self.request.query_params.get('tag')
-        if tag is not None :
-            queryset = Topic.objects.filter(topic_tag__tag_name=tag)
-        else : queryset = Topic.objects.all()
-        return queryset
+    queryset = Topic.objects.all()
 
     def create(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -53,7 +47,6 @@ class TopicViewSet(viewsets.ModelViewSet):
                 'topic_header': request.data['topic_header'],
                 'topic_body': request.data['topic_body'],
                 'topic_user': request.user.user_name,
-                'topic_tag': request.data['topic_tag']
             })
             
             serializer.is_valid(raise_exception=True)

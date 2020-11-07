@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'topics.apps.TopicsConfig',
     'users.apps.UsersConfig',
     'api.apps.ApiConfig',
-    'tags.apps.TagsConfig',
     'comments.apps.CommentsConfig'
 ]
 
