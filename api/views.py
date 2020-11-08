@@ -40,7 +40,7 @@ class TopicViewSet(viewsets.ModelViewSet):
         if request.user.is_authenticated:
             user = CustomUser.objects.get(user_id=request.user.user_id)
         else:
-            return Response('The user is not authenticated.', status=401)
+            return Response('Bad user token', status=401)
             
         #Create Topic Object
         try:
@@ -55,6 +55,30 @@ class TopicViewSet(viewsets.ModelViewSet):
             headers = self.get_success_headers(serializer.data)
             return Response(data="Created Topic Successfully.", status=200)
         except Exception as e:
+            return Response(data=str(e), status=400)
+
+    def partial_update(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return Response('Bad user token', status=401)
+        if not request.data:
+            return Response('Empty request body', status=400)
+
+        topic_id = self.kwargs['pk']
+        try:
+            topic = Topic.objects.get(topic_id=topic_id)
+        except Topic.DoesNotExist:
+            return Response('The given topic id is not found', status=404)
+        except Exception as e:
+            return Response(data=str(e), status=400)
+
+        if request.user.user_name != topic.topic_user.user_name:
+            return Response('This user is not the owner of this topic', status=401)
+        
+        try:
+            TopicSerializer.update(self, topic, validated_data=request.data)
+            return Response('Edited topic successfully', status=200)
+        except Exception as e:
+            raise e
             return Response(data=str(e), status=400)
 
 class CommentViewSet(viewsets.ModelViewSet):

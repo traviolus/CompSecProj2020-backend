@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.utils import timezone
 
 from users.models import CustomUser
 from topics.models import Topic
@@ -49,6 +50,14 @@ class TopicSerializer(serializers.ModelSerializer):
         new_topic.save()
         return new_topic
 
+    def update(self, instance, validated_data):
+        if 'topic_header' in validated_data: 
+            instance.topic_header = validated_data.pop('topic_header')
+        if 'topic_body' in validated_data:
+            instance.topic_body = validated_data.pop('topic_body')
+        instance.topic_lastmodified = timezone.now()
+        instance.save()
+            
 class CommentSerializer(serializers.ModelSerializer):
     comment_user = serializers.CharField(source='get_user_name')
 
