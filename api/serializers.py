@@ -32,7 +32,7 @@ class CustomJWTSerializer(TokenObtainPairSerializer):
         )
         if user_obj:
             credentials["user_name"] = user_obj.user_name
-        return super().validate(credentials)
+        return super().validate(credentials), {'user_name': credentials['user_name']}
 
 class TopicSerializer(serializers.ModelSerializer):
     topic_user = serializers.CharField(source='get_user_name')

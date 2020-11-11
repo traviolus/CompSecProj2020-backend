@@ -26,10 +26,10 @@ class SigninViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
     def create(self, request, *args, **kwargs):
         try:
-            token = CustomJWTSerializer.validate(CustomJWTSerializer(), attrs=request.data)
+            token, user_name = CustomJWTSerializer.validate(CustomJWTSerializer(), attrs=request.data)
         except Exception as e:
             return Response(str(e), status=400)
-        return Response(token, status=200)
+        return Response(data=dict(user_name, **token), status=200)
 
 class TopicViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
