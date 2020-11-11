@@ -78,7 +78,6 @@ class TopicViewSet(viewsets.ModelViewSet):
             TopicSerializer.update(self, topic, validated_data=request.data)
             return Response('Edited topic successfully', status=200)
         except Exception as e:
-            raise e
             return Response(data=str(e), status=400)
 
 class CommentViewSet(viewsets.ModelViewSet):
