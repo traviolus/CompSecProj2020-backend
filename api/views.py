@@ -26,10 +26,10 @@ class SigninViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
     def create(self, request, *args, **kwargs):
         try:
-            token, user_name = CustomJWTSerializer.validate(CustomJWTSerializer(), attrs=request.data)
+            token, user = CustomJWTSerializer.validate(CustomJWTSerializer(), attrs=request.data)
         except Exception as e:
             return Response(str(e), status=400)
-        return Response(data=dict(user_name, **token), status=200)
+        return Response(data=dict(user, **token), status=200)
 
 class TopicViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
@@ -71,7 +71,7 @@ class TopicViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response(data=str(e), status=400)
 
-        if request.user.user_name != topic.topic_user.user_name:
+        if request.user.user_name != topic.topic_user.user_name and request.user.get_user_status_display() != 'admin':
             return Response('This user is not the owner of this topic', status=401)
         
         try:
