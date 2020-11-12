@@ -74,3 +74,8 @@ class CommentSerializer(serializers.ModelSerializer):
         )
         new_comment.save()
         return new_comment
+
+    def update(self, instance, validated_data):
+        instance.comment_text = validated_data.pop('comment_text')
+        instance.comment_lastmodified = timezone.now()
+        instance.save()

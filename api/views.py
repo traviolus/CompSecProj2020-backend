@@ -80,6 +80,15 @@ class TopicViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response(data=str(e), status=400)
 
+    def destroy(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return Response('Bad user token', status=401)
+        if request.user.get_user_status_display() != 'admin':
+            return Response('You do not have permission to delete.', status=403)
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response("Deleted.", status=200)
+
 class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     serializer_class = CommentSerializer
@@ -105,5 +114,28 @@ class CommentViewSet(viewsets.ModelViewSet):
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response('Created Comment Successfully', status=200)
+        except Exception as e:
+            return Response(data=str(e), status=400)
+
+    def partial_update(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return Response('Bad user token', status=401)
+        if not request.data:
+            return Response('Empty request body', status=400)
+
+        comment_id = self.kwargs['pk']
+        try:
+            comment = Comment.objects.get(comment_id=comment_id)
+        except Comment.DoesNotExist:
+            return Response('The given comment id is not found', status=404)
+        except Exception as e:
+            return Response(data=str(e), status=400)
+
+        if request.user.user_name != comment.comment_user.user_name:
+            return Response('This user is not the owner of this topic', status=401)
+        
+        try:
+            CommentSerializer.update(self, comment, validated_data=request.data)
+            return Response('Edited comment successfully', status=200)
         except Exception as e:
             return Response(data=str(e), status=400)
