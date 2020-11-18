@@ -13,10 +13,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = "__all__"
 
-    def validate_password(self, value):
-        user = self.context['request'].user
-        validate_password(password=value, user=user)
-
     def create(self, validated_data):
         password = validated_data.pop('password')
         validate_password(password)
