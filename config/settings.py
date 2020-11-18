@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '!&f*ym0%8cm3x00+t^i)5qbsaz9x6e=yj$@%w+hz6gsr6gx6k2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS = ['127.0.0.1']
@@ -126,13 +126,25 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'OPTIONS': {
+            'min_length': 8,
+        }
     },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+    {
+        'NAME': 'config.validators.NumberValidator',
+    },
+    {
+        'NAME': 'config.validators.UppercaseValidator',
+    },
+    {
+        'NAME': 'config.validators.LowercaseValidator',
+    },
+    {
+        'NAME': 'config.validators.SymbolValidator'
+    }
 ]
 
 AUTH_USER_MODEL = 'users.CustomUser'

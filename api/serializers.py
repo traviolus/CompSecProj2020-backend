@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
 from django.utils import timezone
+from django.contrib.auth.password_validation import validate_password
 
 from users.models import CustomUser
 from topics.models import Topic
@@ -11,10 +13,16 @@ class CustomUserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = "__all__"
 
+    def validate_password(self, value):
+        user = self.context['request'].user
+        validate_password(password=value, user=user)
+
     def create(self, validated_data):
+        password = validated_data.pop('password')
+        validate_password(password)
         user = CustomUser.objects.create_user(
             user_name=validated_data.pop("user_name"),
-            password=validated_data.pop("password"),
+            password=password,
             user_email=validated_data.pop("user_email"),
         )
         user.save()
