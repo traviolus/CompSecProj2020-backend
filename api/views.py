@@ -133,7 +133,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response(data=str(e), status=400, headers=custom_headers)
 
-        if request.user.user_name != comment.comment_user.user_name:
+        if request.user.user_name != comment.comment_user.user_name and request.user.get_user_status_display() != 'admin':
             return Response('This user is not the owner of this topic', status=401, headers=custom_headers)
         
         try:
